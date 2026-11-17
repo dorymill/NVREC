@@ -151,10 +151,10 @@ esp_err_t cameraStop (Camera_t* cam)
 }
 
 /**
- * @brief             This function is the work function for the 
- *                    camera device, acquiring the individual video
- *                    frames for passage to further processing, e.g.
- *                    encoders and SD Cards.
+ * @brief This function is the work function for the 
+ *        camera device, acquiring the individual video
+ *        frames for passage to further processing, e.g.
+ *        encoders and SD Cards.
  * 
  * @param cam        Pointer to camera device
  * @param output     Pointer to output buffer address
@@ -182,8 +182,8 @@ esp_err_t cameraGetFrame (Camera_t* cam, void** output, size_t* outLen, int* out
 }
 
 /**
- * @brief            This function must be called after frame handling
- *                   and will release the frame to allow further capture.
+ * @brief This function must be called after frame handling
+ *        and will release the frame to allow further capture.
  * 
  * @param cam        Pointer to camera device
  * @param idx        Buffer index for the frame to release

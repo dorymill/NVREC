@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include "Types.h"
+#include "esp_log.h"
 #include "Consts.h"
 #include "Camera.h"
 #include "Encoder.h"
-#include "esp_log.h"
+#include "WiFi.h"
+#include "Stream.h"
 
 static const char* TAG = "|Main|";
 
@@ -11,16 +13,18 @@ void app_main(void)
 {
 
     Camera_t cam;
-    Encoder_t h264;
+    Encoder_t jpegEnc;
     uint32_t testFrameCnt = 3000;
 
     ESP_ERROR_CHECK(cameraInit(&cam, WIDTH, HEIGHT, PX_FMT));
     ESP_ERROR_CHECK(cameraStart(&cam));
-    ESP_ERROR_CHECK(encoderInit(&h264, SD, WIDTH, HEIGHT));
+    ESP_ERROR_CHECK(encoderInit(&jpegEnc, WIFI, WIDTH, HEIGHT));
+    ESP_ERROR_CHECK(wifiApInit(AP_SSID, AP_PASS, 8));
+    ESP_ERROR_CHECK(streamInit());
 
-    ESP_LOGI(TAG, "[+] Recording %d frames. . .", testFrameCnt);
+    ESP_LOGI(TAG, "[+] Main Test Loop Running. . .", testFrameCnt);
 
-    for(int idx = 0; idx < testFrameCnt; idx++) {
+    for(;;) {
 
         void*  frame;
         size_t fLen;
@@ -32,20 +36,20 @@ void app_main(void)
         /*Encode and save block */
 
         /* H.264 Encoding */
-        uint8_t* h264data;
-        size_t h264len;
+        uint8_t* jpegData;
+        size_t jpegLen;
 
-        encoderEncode(&h264, frame, fLen, &h264data, &h264len);
+        encoderEncode(&jpegEnc, frame, fLen, &jpegData, &jpegLen);
 
         /* Do something with the data (add to queue for a task.) */
-
+        streamPublishFrame(jpegData, jpegLen);
 
         /* Release the frame */
         cameraReleaseFrame(&cam, fIdx);
 
     }
 
-    ESP_ERROR_CHECK(encoderDeInit(&h264));
+    ESP_ERROR_CHECK(encoderDeInit(&jpegEnc));
     ESP_ERROR_CHECK(cameraStop(&cam));
     ESP_ERROR_CHECK(cameraDeInit(&cam));
 

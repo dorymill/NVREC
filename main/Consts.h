@@ -18,5 +18,13 @@
 #define SD_KEYFRAME_RATE 30                          /* Keyframe Rate [frames]*/
 #define ENC_REPORT_RATE  300                         /* Report rate for debug logging */
 
+/* WiFi Defines */
+#define MAX_CONNECTIONS 1
+#define AP_SSID "NVREC Mk. 0"
+#define AP_PASS "nvtest365"
+
+/* Stream defines */
+#define STREAM_WAIT_MS 11
+#define HEADER_LEN     64
 
 #endif

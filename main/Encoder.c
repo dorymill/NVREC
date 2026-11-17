@@ -21,7 +21,7 @@ static const char* TAG = "|Encoder|";
  *        as determined by the two pre-selected paths: MP4 for SD-Card
  *        file I/O and JPEG for real-time streaming via WiFi.
  * 
- * @param dest       Streaming Destionation: SD, WIFI
+ * @param dest       Streaming Destination: SD, WIFI
  * @param devPath    Linux device path to streaming device (See esp_video_Device.h)
  * @param codecFmt   Codec Pixel Format
  * @return esp_err_t Error Code
@@ -51,13 +51,16 @@ static esp_err_t getDeviceParams (EncDest_t dest, const char** devPath, uint32_t
 }
 
 /**
- * @brief 
+ * @brief This function initializes the encoder using pre-specified settings
+ *        determined by the encoder paths found in the EncDest_t enum. At
+ *        present these are just for SD Card file I/O, and WiFi streaming.
+ *        To-Do: Add individual JPEG image capture.
  * 
- * @param enc 
- * @param dest 
- * @param width 
- * @param height 
- * @return esp_err_t 
+ * @param enc        Pointer to encoder object
+ * @param dest       Encoder destination: (SD, WiFi)
+ * @param width      Frame width
+ * @param height     Frame Height
+ * @return esp_err_t Error Code
  */
 esp_err_t encoderInit(Encoder_t* enc, EncDest_t dest, uint32_t width, 
                       uint32_t height)
@@ -190,6 +193,19 @@ esp_err_t encoderInit(Encoder_t* enc, EncDest_t dest, uint32_t width,
     return ESP_OK;
 }
 
+/**
+ * @brief This function does the actual encoding, using the same ioctl
+ *        call pattern as the camera, but passing the output of the
+ *        camera into the encoder, and setting the output pointer to
+ *        freshly encoded frame.
+ * 
+ * @param enc        Pointer to encoder object
+ * @param yuvFrame   Pointer to raw input frame
+ * @param yuvLen     Raw Frame length
+ * @param output     Pointer to encoded output buffer array
+ * @param outLen     Number of bytes in encoded output
+ * @return esp_err_t Error Code
+ */
 esp_err_t encoderEncode(Encoder_t* enc, void* yuvFrame,
                         size_t yuvLen, uint8_t** output, size_t* outLen)
 {
@@ -245,7 +261,14 @@ esp_err_t encoderEncode(Encoder_t* enc, void* yuvFrame,
     return ESP_OK;
 }
 
-
+/**
+ * @brief This function simply tears down the encoder. It must
+ *        be called before tearing down the camera, or camera 
+ *        de-init will fail.
+ * 
+ * @param enc        Pointer to encoder object
+ * @return esp_err_t Error Code
+ */
 esp_err_t encoderDeInit (Encoder_t* enc)
 {
 
